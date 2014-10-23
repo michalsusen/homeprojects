@@ -27,36 +27,29 @@ int currentDigit = 0;
 int maxDigits = 2;
 int temperature = 0;
 
+uint8_t buf[VW_MAX_MESSAGE_LEN];
+uint8_t buflen = VW_MAX_MESSAGE_LEN;
+
 void setup()
 {
-    Serial.begin(9600);	// Debugging only
-    Serial.println("setup");
-    
     for(int i=0;i<8;i++) 
       pinMode(segments[i], OUTPUT); 
     for(int i=0;i<maxDigits;i++) 
       pinMode(digits[i], OUTPUT); 
     
     vw_set_rx_pin(receive_pin); 
-    vw_setup(2000);	 // Bits per sec
-    vw_rx_start();       // Start the receiver PLL running
+    vw_setup(2000);	 
+    vw_rx_start();       
    
-    MsTimer2::set(1, changeSegment); // 1ms period
-    MsTimer2::start();
-    
+    MsTimer2::set(1, changeSegment); 
+    MsTimer2::start();  
 }
 
 void loop()
 {
-    uint8_t buf[VW_MAX_MESSAGE_LEN];
-    uint8_t buflen = VW_MAX_MESSAGE_LEN;
-    
-    if (vw_get_message(buf, &buflen)) // Non-blocking
+    if (vw_get_message(buf, &buflen)) 
     {
       temperature = buf[0];
-      Serial.print(temperature);
-      Serial.println("");
-	
     }
 }
 
@@ -89,7 +82,3 @@ void changeSegment()
     currentDigit=0;
 }
 
-void setDP(boolean state)
-{
-  digitalWrite(segments[7],state);
-}
